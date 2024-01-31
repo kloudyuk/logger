@@ -78,3 +78,7 @@ func (l *Logger) WithError(err error) *Logger {
 func (l *Logger) WithGroup(name string) *Logger {
 	return &Logger{l.slogger.WithGroup(name)}
 }
+
+func DefaultLogger() *Logger {
+	return defaultLogger
+}
