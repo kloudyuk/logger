@@ -20,7 +20,7 @@ var defaultLogger *Logger
 type Fields map[string]any
 
 type Logger struct {
-	logger *slog.Logger
+	slogger *slog.Logger
 }
 
 func Initialise(debug bool) {
@@ -43,27 +43,25 @@ func Initialise(debug bool) {
 		},
 	})
 	defaultLogger = &Logger{slog.New(handler)}
-	slog.SetDefault(defaultLogger.logger)
+	slog.SetDefault(defaultLogger.slogger)
 	defaultLogger.Debug("log level set", "LOG_LEVEL", lvl.String())
 }
 
-// Internal Logger Funcs
-
 func (l *Logger) Debug(msg string, args ...any) {
-	l.logger.Debug(msg, args...)
+	l.slogger.Debug(msg, args...)
 }
 
 func (l *Logger) Error(msg string, args ...any) {
-	l.logger.Error(msg, args...)
+	l.slogger.Error(msg, args...)
 }
 
 func (l *Logger) Fatal(msg string, args ...any) {
-	l.logger.Log(context.Background(), levelFatal, msg, args...)
+	l.slogger.Log(context.Background(), levelFatal, msg, args...)
 	os.Exit(1)
 }
 
 func (l *Logger) Info(msg string, args ...any) {
-	l.logger.Info(msg, args...)
+	l.slogger.Info(msg, args...)
 }
 
 func (l *Logger) With(fields Fields) *Logger {
@@ -71,43 +69,13 @@ func (l *Logger) With(fields Fields) *Logger {
 	for k, v := range fields {
 		args = append(args, k, v)
 	}
-	return &Logger{l.logger.With(args...)}
+	return &Logger{l.slogger.With(args...)}
 }
 
 func (l *Logger) WithError(err error) *Logger {
-	return &Logger{l.logger.With("err", err)}
+	return &Logger{l.slogger.With("err", err)}
 }
 
 func (l *Logger) WithGroup(name string) *Logger {
-	return &Logger{l.logger.WithGroup(name)}
-}
-
-// External Logger Funcs
-
-func Debug(msg string, args ...any) {
-	defaultLogger.Debug(msg, args...)
-}
-
-func Error(msg string, args ...any) {
-	defaultLogger.Error(msg, args...)
-}
-
-func Fatal(msg string, args ...any) {
-	defaultLogger.Fatal(msg, args...)
-}
-
-func Info(msg string, args ...any) {
-	defaultLogger.Info(msg, args...)
-}
-
-func With(fields Fields) *Logger {
-	return defaultLogger.With(fields)
-}
-
-func WithError(err error) *Logger {
-	return defaultLogger.WithError(err)
-}
-
-func WithGroup(name string) *Logger {
-	return defaultLogger.WithGroup(name)
+	return &Logger{l.slogger.WithGroup(name)}
 }
